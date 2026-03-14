@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}My Listings – FlatFinder{% endblock %}
+{% block content %}
+<div class="container" style="padding-top:2rem; padding-bottom:3rem;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="margin:0;">My <span style="color:var(--clay);">Listings</span></h2>
+        <a href="{% url 'add_listing' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Add New</a>
+    </div>
+    <div class="row g-4">
+        {% for listing in listings %}
+        <div class="col-md-4">
+            <div class="listing-card card h-100">
+                {% with listing.get_primary_image as img %}
+                {% if img %}<img src="{{ img.image.url }}" class="card-img-top" alt="{{ listing.title }}">
+                {% else %}<div class="img-placeholder"><i class="fas fa-building"></i></div>{% endif %}
+                {% endwith %}
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="badge-type">{{ listing.get_property_type_display }}</span>
+                        {% if listing.is_available %}<span style="color:var(--green);font-size:0.8rem;font-weight:600;">● Available</span>
+                        {% else %}<span style="color:red;font-size:0.8rem;font-weight:600;">● Unavailable</span>{% endif %}
+                    </div>
+                    <h5 style="font-size:1rem;">{{ listing.title }}</h5>
+                    <p style="color:#888;font-size:0.85rem;">{{ listing.city }} · ₹{{ listing.price|floatformat:"0" }}/mo</p>
+                    <p style="font-size:0.75rem;color:#aaa;">{{ listing.inquiries.count }} inquiry(s) received</p>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3 d-flex gap-2">
+                    <a href="{% url 'listing_detail' listing.pk %}" class="btn btn-outline-primary flex-grow-1">View</a>
+                    <form method="post" action="{% url 'delete_listing' listing.pk %}" onsubmit="return confirm('Delete this listing?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5" style="color:#888;">
+            <i class="fas fa-home fa-3x mb-3" style="color:var(--clay);"></i>
+            <p>You haven't posted any listings yet.</p>
+            <a href="{% url 'add_listing' %}" class="btn btn-primary">Post Your First Listing</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

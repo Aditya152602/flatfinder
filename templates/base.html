@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FlatFinder – Find Your Perfect Home{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <style>
+        :root {
+            --sand: #F5F0E8;
+            --clay: #C4956A;
+            --terracotta: #B5541D;
+            --deep: #1C1C1E;
+            --mid: #3A3A3C;
+            --light: #F9F6F1;
+            --accent: #E8A87C;
+            --green: #4A7C59;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            color: var(--deep);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+        /* NAVBAR */
+        .navbar {
+            background: var(--deep) !important;
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--clay);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--sand) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand span { color: var(--clay); }
+
+        .nav-link {
+            color: #aaa !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            transition: color 0.2s;
+            padding: 0.5rem 1rem !important;
+        }
+
+        .nav-link:hover, .nav-link.active { color: var(--sand) !important; }
+
+        .btn-nav {
+            background: var(--clay);
+            color: white !important;
+            border-radius: 6px;
+            padding: 0.4rem 1.2rem !important;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-nav:hover { background: var(--terracotta); }
+
+        /* BUTTONS */
+        .btn-primary {
+            background: var(--clay);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover { background: var(--terracotta); transform: translateY(-1px); }
+
+        .btn-outline-primary {
+            border-color: var(--clay);
+            color: var(--clay);
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-outline-primary:hover { background: var(--clay); border-color: var(--clay); }
+
+        /* CARDS */
+        .listing-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.25s, box-shadow 0.25s;
+            background: white;
+        }
+
+        .listing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+        }
+
+        .listing-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .listing-card .price-tag {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--terracotta);
+            font-weight: 700;
+        }
+
+        .badge-type {
+            background: var(--clay);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* FORM CONTROLS */
+        .form-control:focus, .form-select:focus {
+            border-color: var(--clay);
+            box-shadow: 0 0 0 0.2rem rgba(196,149,106,0.2);
+        }
+
+        /* FILTER BAR */
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            margin-bottom: 2rem;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--deep);
+            color: #888;
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 4rem;
+            border-top: 2px solid var(--clay);
+        }
+
+        footer h6 {
+            color: var(--sand);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 1rem;
+        }
+
+        footer a { color: #888; text-decoration: none; }
+        footer a:hover { color: var(--clay); }
+
+        /* ALERTS */
+        .alert {
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+        }
+
+        /* AMENITY BADGES */
+        .amenity-badge {
+            background: var(--sand);
+            border-radius: 6px;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.8rem;
+            color: var(--mid);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* NO IMAGE placeholder */
+        .img-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, var(--sand), #e8ddd0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--clay);
+            font-size: 2.5rem;
+        }
+
+        /* Pagination */
+        .page-link {
+            color: var(--clay);
+            border-color: #ddd;
+        }
+        .page-item.active .page-link {
+            background: var(--clay);
+            border-color: var(--clay);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">Flat<span>Finder</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'listing_list' %}">Browse Flats</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'listing_map' %}"><i class="fas fa-map-marker-alt me-1"></i>Map View</a></li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'saved_listings' %}"><i class="fas fa-heart me-1"></i>Saved</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'add_listing' %}">+ Post Listing</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user-circle me-1"></i>{{ user.username }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'my_listings' %}">My Listings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="btn-nav nav-link" href="{% url 'register' %}">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h6>FlatFinder</h6>
+                    <p style="font-size:0.85rem">Find your perfect home with ease. Browse thousands of flats and apartments across India.</p>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <h6>Browse</h6>
+                    <ul class="list-unstyled" style="font-size:0.85rem">
+                        <li><a href="{% url 'listing_list' %}">All Listings</a></li>
+                        <li><a href="{% url 'listing_map' %}">Map View</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <h6>Account</h6>
+                    <ul class="list-unstyled" style="font-size:0.85rem">
+                        <li><a href="{% url 'register' %}">Sign Up</a></li>
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>Contact</h6>
+                    <p style="font-size:0.85rem">support@flatfinder.in<br>Made with ♥ in India</p>
+                </div>
+            </div>
+            <hr style="border-color:#333">
+            <p class="text-center mb-0" style="font-size:0.8rem">© 2025 FlatFinder. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

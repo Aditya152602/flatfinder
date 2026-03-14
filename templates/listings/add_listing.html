@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Post a Listing – FlatFinder{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2rem; padding-bottom:3rem; max-width:760px;">
+    <h2 style="margin-bottom:0.5rem;">Post a <span style="color:var(--clay);">New Listing</span></h2>
+    <p style="color:#888; margin-bottom:2rem;">Fill in the details below to list your property.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;">
+            <h5 style="margin-bottom:1.5rem; color:var(--clay);">Basic Information</h5>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Title</label>
+                {{ form.title }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Description</label>
+                {{ form.description }}
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Property Type</label>
+                    {{ form.property_type }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Monthly Rent (₹)</label>
+                    {{ form.price }}
+                </div>
+            </div>
+        </div>
+
+        <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;">
+            <h5 style="margin-bottom:1.5rem; color:var(--clay);">Location</h5>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Street / Area</label>
+                {{ form.location }}
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">City</label>
+                    {{ form.city }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">State</label>
+                    {{ form.state }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Pincode</label>
+                    {{ form.pincode }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Latitude <small class="text-muted">(for map, optional)</small></label>
+                    {{ form.latitude }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Longitude <small class="text-muted">(for map, optional)</small></label>
+                    {{ form.longitude }}
+                </div>
+            </div>
+        </div>
+
+        <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;">
+            <h5 style="margin-bottom:1.5rem; color:var(--clay);">Property Details</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Bedrooms</label>
+                    {{ form.bedrooms }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Bathrooms</label>
+                    {{ form.bathrooms }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Area (sq.ft)</label>
+                    {{ form.area_sqft }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Furnishing</label>
+                    {{ form.furnishing }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Floor</label>
+                    {{ form.floor }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Total Floors</label>
+                    {{ form.total_floors }}
+                </div>
+            </div>
+        </div>
+
+        <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;">
+            <h5 style="margin-bottom:1.5rem; color:var(--clay);">Amenities</h5>
+            <div class="row g-3">
+                {% for field in form %}
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                    <div class="col-6 col-md-4">
+                        <div class="form-check">
+                            {{ field }}
+                            <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;">
+            <h5 style="margin-bottom:1.5rem; color:var(--clay);">Contact Details</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Phone Number</label>
+                    {{ form.owner_contact }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Email</label>
+                    {{ form.owner_email }}
+                </div>
+            </div>
+        </div>
+
+        <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;">
+            <h5 style="margin-bottom:1.5rem; color:var(--clay);">Photos</h5>
+            <input type="file" name="images" multiple accept="image/*" class="form-control">
+            <small class="text-muted mt-1 d-block">Upload up to 6 photos. First image will be the cover photo.</small>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                {{ form.is_available }}
+                <label class="form-check-label" for="{{ form.is_available.id_for_label }}">Mark as Available</label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary px-5 py-2" style="font-size:1.05rem;">
+            <i class="fas fa-plus-circle me-2"></i>Post Listing
+        </button>
+    </form>
+</div>
+{% endblock %}

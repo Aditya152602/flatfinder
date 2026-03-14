@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}My Profile – FlatFinder{% endblock %}
+{% block content %}
+<div class="container" style="max-width:600px; padding-top:2rem; padding-bottom:3rem;">
+    <h2 style="margin-bottom:2rem;">My <span style="color:var(--clay);">Profile</span></h2>
+    <div style="background:white;border-radius:16px;padding:2rem;box-shadow:0 2px 16px rgba(0,0,0,0.07);">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">First Name</label>
+                    <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Last Name</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}">
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Phone</label>
+                    {{ form.phone }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">City</label>
+                    {{ form.city }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Bio</label>
+                    {{ form.bio }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Profile Photo</label>
+                    {{ form.avatar }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4 px-5">Save Changes</button>
+        </form>
+    </div>
+
+    <div class="mt-3 d-flex gap-3">
+        <a href="{% url 'my_listings' %}" class="btn btn-outline-primary">My Listings</a>
+        <a href="{% url 'saved_listings' %}" class="btn btn-outline-secondary">Saved Listings</a>
+    </div>
+</div>
+{% endblock %}

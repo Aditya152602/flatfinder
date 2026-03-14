@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Login – FlatFinder{% endblock %}
+{% block content %}
+<div class="container" style="max-width:460px; padding-top:4rem; padding-bottom:4rem;">
+    <div style="background:white;border-radius:16px;padding:2.5rem;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <h2 style="text-align:center;margin-bottom:0.5rem;">Welcome Back</h2>
+        <p style="text-align:center;color:#888;margin-bottom:2rem;">Sign in to your FlatFinder account</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Password</label>
+                {{ form.password }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2" style="font-size:1rem;">Login</button>
+        </form>
+        <hr style="margin:1.5rem 0;">
+        <p style="text-align:center;color:#888;font-size:0.9rem;">Don't have an account? <a href="{% url 'register' %}" style="color:var(--clay);font-weight:600;">Sign Up</a></p>
+    </div>
+</div>
+{% endblock %}

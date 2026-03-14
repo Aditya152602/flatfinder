@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up – FlatFinder{% endblock %}
+{% block content %}
+<div class="container" style="max-width:520px; padding-top:3rem; padding-bottom:3rem;">
+    <div style="background:white;border-radius:16px;padding:2.5rem;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <h2 style="text-align:center;margin-bottom:0.5rem;">Create Account</h2>
+        <p style="text-align:center;color:#888;margin-bottom:2rem;">Join FlatFinder to save listings and contact owners</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">First Name</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Last Name</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+            <div class="mt-3 mb-3">
+                <label class="form-label fw-semibold">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                {{ form.email }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                {{ form.password1 }}
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Confirm Password</label>
+                {{ form.password2 }}
+            </div>
+            {% if form.errors %}
+            <div class="alert alert-danger" style="font-size:0.85rem;">
+                {% for field in form %}{% for err in field.errors %}<div>{{ field.label }}: {{ err }}</div>{% endfor %}{% endfor %}
+                {% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}
+            </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary w-100 py-2" style="font-size:1rem;">Create Account</button>
+        </form>
+        <hr style="margin:1.5rem 0;">
+        <p style="text-align:center;color:#888;font-size:0.9rem;">Already have an account? <a href="{% url 'login' %}" style="color:var(--clay);font-weight:600;">Login</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Map View – FlatFinder{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+#map { height: calc(100vh - 160px); width: 100%; border-radius: 0; }
+.map-sidebar { height: calc(100vh - 160px); overflow-y: auto; background: white; border-right: 1px solid #eee; }
+.map-card { padding: 1rem; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.15s; }
+.map-card:hover { background: var(--sand); }
+.map-card .price { font-family: 'Playfair Display', serif; color: var(--terracotta); font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex" style="margin-top:-1rem;">
+    <!-- Sidebar list -->
+    <div class="map-sidebar" style="width:320px; min-width:320px;">
+        <div style="padding:1rem; border-bottom:1px solid #eee;">
+            <h6 style="margin:0; font-weight:700;">{{ listings_data|length }} listings on map</h6>
+        </div>
+        <div id="sidebarList">
+            {% for l in listings_data %}
+            <div class="map-card" onclick="flyTo({{ l.lat }}, {{ l.lng }}, {{ l.id }})">
+                <div class="d-flex justify-content-between">
+                    <span style="font-weight:600; font-size:0.9rem;">{{ l.title }}</span>
+                    <span class="price" style="font-size:0.9rem;">₹{{ l.price }}</span>
+                </div>
+                <div style="font-size:0.8rem;color:#888;">{{ l.city }} · {{ l.bedrooms }} BHK · {{ l.property_type }}</div>
+            </div>
+            {% empty %}
+            <div style="padding:2rem; text-align:center; color:#888;">
+                <i class="fas fa-map-marker-alt fa-2x mb-2" style="color:var(--clay);"></i>
+                <p>No listings with location data found.</p>
+                <p style="font-size:0.8rem;">Add lat/lng when posting a listing to see it here.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div style="flex:1;">
+        <div id="map"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const listings = {{ listings_data|safe }};
+const map = L.map('map').setView([22.5, 80.0], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap'}).addTo(map);
+
+const markers = {};
+listings.forEach(l => {
+    const marker = L.marker([l.lat, l.lng]).addTo(map);
+    marker.bindPopup(`
+        <b>${l.title}</b><br>
+        <span style="color:#B5541D;font-weight:700;">₹${l.price}/mo</span><br>
+        ${l.city} · ${l.bedrooms} BHK<br>
+        <a href="/listings/${l.id}/" style="color:#C4956A;">View Details →</a>
+    `);
+    markers[l.id] = marker;
+});
+
+function flyTo(lat, lng, id) {
+    map.flyTo([lat, lng], 15);
+    if (markers[id]) markers[id].openPopup();
+}
+</script>
+{% endblock %}

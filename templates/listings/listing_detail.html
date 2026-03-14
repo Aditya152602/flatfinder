@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block title %}{{ listing.title }} – FlatFinder{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+#map { height: 320px; border-radius: 12px; }
+.gallery-img { height: 70px; width: 100px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+.gallery-img:hover, .gallery-img.active { border-color: var(--clay); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:2rem; padding-bottom:3rem;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb" style="font-size:0.85rem;">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" style="color:var(--clay);">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'listing_list' %}" style="color:var(--clay);">Listings</a></li>
+            <li class="breadcrumb-item active">{{ listing.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- LEFT: Main Content -->
+        <div class="col-lg-8">
+            <!-- Main Image -->
+            <div style="border-radius:12px; overflow:hidden; margin-bottom:1rem;">
+                {% with listing.get_primary_image as main_img %}
+                {% if main_img %}
+                    <img id="mainImage" src="{{ main_img.image.url }}" alt="{{ listing.title }}" style="width:100%; height:420px; object-fit:cover;">
+                {% else %}
+                    <div class="img-placeholder" style="height:420px;"><i class="fas fa-building"></i></div>
+                {% endif %}
+                {% endwith %}
+            </div>
+            <!-- Thumbnails -->
+            {% if listing.images.count > 1 %}
+            <div class="d-flex gap-2 flex-wrap mb-3">
+                {% for img in listing.images.all %}
+                <img src="{{ img.image.url }}" class="gallery-img {% if forloop.first %}active{% endif %}"
+                     onclick="document.getElementById('mainImage').src='{{ img.image.url }}'; document.querySelectorAll('.gallery-img').forEach(e=>e.classList.remove('active')); this.classList.add('active');">
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Title & Basic Info -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <span class="badge-type mb-2">{{ listing.get_property_type_display }}</span>
+                    <h1 style="font-size:1.8rem; margin:0;">{{ listing.title }}</h1>
+                    <p style="color:#888; margin-top:0.3rem;"><i class="fas fa-map-marker-alt me-1" style="color:var(--clay);"></i>{{ listing.location }}, {{ listing.city }}, {{ listing.state }} – {{ listing.pincode }}</p>
+                </div>
+                <div class="text-end">
+                    <div style="font-family:'Playfair Display',serif; font-size:2rem; color:var(--terracotta); font-weight:700;">₹{{ listing.price|floatformat:"0" }}</div>
+                    <div style="font-size:0.8rem; color:#888;">per month</div>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'save_listing' listing.pk %}" class="btn btn-sm mt-1 {% if is_saved %}btn-danger{% else %}btn-outline-secondary{% endif %}">
+                        <i class="fas fa-heart"></i> {% if is_saved %}Saved{% else %}Save{% endif %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Key Stats -->
+            <div class="row g-2 mb-4">
+                {% for stat in "" %}{% endfor %}
+                <div class="col-6 col-md-3">
+                    <div style="background:white;border-radius:10px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="color:var(--clay);font-size:1.3rem;"><i class="fas fa-bed"></i></div>
+                        <div style="font-weight:700;">{{ listing.bedrooms }} BHK</div>
+                        <div style="font-size:0.75rem;color:#888;">Bedrooms</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div style="background:white;border-radius:10px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="color:var(--clay);font-size:1.3rem;"><i class="fas fa-bath"></i></div>
+                        <div style="font-weight:700;">{{ listing.bathrooms }}</div>
+                        <div style="font-size:0.75rem;color:#888;">Bathrooms</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div style="background:white;border-radius:10px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="color:var(--clay);font-size:1.3rem;"><i class="fas fa-vector-square"></i></div>
+                        <div style="font-weight:700;">{{ listing.area_sqft }}</div>
+                        <div style="font-size:0.75rem;color:#888;">Sq. Ft.</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div style="background:white;border-radius:10px;padding:1rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="color:var(--clay);font-size:1.3rem;"><i class="fas fa-couch"></i></div>
+                        <div style="font-weight:700;font-size:0.85rem;">{{ listing.get_furnishing_display }}</div>
+                        <div style="font-size:0.75rem;color:#888;">Furnishing</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div style="background:white;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                <h4 style="margin-bottom:1rem;">About this Property</h4>
+                <p style="color:#555;line-height:1.8;">{{ listing.description }}</p>
+            </div>
+
+            <!-- Amenities -->
+            <div style="background:white;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                <h4 style="margin-bottom:1rem;">Amenities</h4>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if listing.parking %}<span class="amenity-badge"><i class="fas fa-car"></i> Parking</span>{% endif %}
+                    {% if listing.balcony %}<span class="amenity-badge"><i class="fas fa-wind"></i> Balcony</span>{% endif %}
+                    {% if listing.gym %}<span class="amenity-badge"><i class="fas fa-dumbbell"></i> Gym</span>{% endif %}
+                    {% if listing.swimming_pool %}<span class="amenity-badge"><i class="fas fa-swimming-pool"></i> Swimming Pool</span>{% endif %}
+                    {% if listing.security %}<span class="amenity-badge"><i class="fas fa-shield-alt"></i> 24/7 Security</span>{% endif %}
+                    {% if listing.floor %}<span class="amenity-badge"><i class="fas fa-building"></i> Floor {{ listing.floor }}/{{ listing.total_floors }}</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Map -->
+            {% if listing.latitude and listing.longitude %}
+            <div style="background:white;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                <h4 style="margin-bottom:1rem;"><i class="fas fa-map-marker-alt me-2" style="color:var(--clay);"></i>Location</h4>
+                <div id="map"></div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT: Sidebar -->
+        <div class="col-lg-4">
+            <!-- Owner Info -->
+            <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:1.5rem;position:sticky;top:80px;">
+                <h5 style="margin-bottom:1rem;">Contact Owner</h5>
+                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+                    <div style="width:48px;height:48px;background:var(--sand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--clay);">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;">{{ listing.owner.get_full_name|default:listing.owner.username }}</div>
+                        <div style="font-size:0.8rem;color:#888;">Property Owner</div>
+                    </div>
+                </div>
+                <a href="tel:{{ listing.owner_contact }}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-phone me-2"></i>{{ listing.owner_contact }}
+                </a>
+                <a href="mailto:{{ listing.owner_email }}" class="btn btn-outline-primary w-100 mb-3">
+                    <i class="fas fa-envelope me-2"></i>Send Email
+                </a>
+
+                <!-- Inline contact form -->
+                {% if user.is_authenticated %}
+                <hr>
+                <h6 style="margin-bottom:1rem;">Send a Message</h6>
+                <form method="post" action="{% url 'contact_owner' listing.pk %}">
+                    {% csrf_token %}
+                    {% for field in contact_form %}
+                    <div class="mb-2">{{ field }}</div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                </form>
+                {% else %}
+                <div class="text-center" style="background:var(--sand);border-radius:8px;padding:1rem;">
+                    <p style="font-size:0.85rem;color:#666;margin-bottom:0.5rem;">Login to message the owner</p>
+                    <a href="{% url 'login' %}?next={% url 'listing_detail' listing.pk %}" class="btn btn-primary btn-sm">Login</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Quick Details -->
+            <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                <h6 style="margin-bottom:1rem;">Quick Details</h6>
+                <table class="table table-sm" style="font-size:0.85rem;">
+                    <tr><td style="color:#888;">Listed on</td><td>{{ listing.created_at|date:"d M Y" }}</td></tr>
+                    <tr><td style="color:#888;">Status</td><td>{% if listing.is_available %}<span style="color:var(--green);font-weight:600;">Available</span>{% else %}<span style="color:red;">Not Available</span>{% endif %}</td></tr>
+                    <tr><td style="color:#888;">City</td><td>{{ listing.city }}</td></tr>
+                    {% if listing.floor %}<tr><td style="color:#888;">Floor</td><td>{{ listing.floor }} of {{ listing.total_floors }}</td></tr>{% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Similar Listings -->
+    {% if similar %}
+    <div class="mt-5">
+        <h3 style="margin-bottom:1.5rem;">Similar in <span style="color:var(--clay);">{{ listing.city }}</span></h3>
+        <div class="row g-4">
+            {% for s in similar %}
+            <div class="col-md-4">
+                <div class="listing-card card">
+                    {% with s.get_primary_image as img %}
+                    {% if img %}<img src="{{ img.image.url }}" class="card-img-top" alt="{{ s.title }}">
+                    {% else %}<div class="img-placeholder"><i class="fas fa-building"></i></div>{% endif %}
+                    {% endwith %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6>{{ s.title }}</h6>
+                            <span class="price-tag" style="font-size:1rem;">₹{{ s.price|floatformat:"0" }}</span>
+                        </div>
+                        <p style="color:#888;font-size:0.8rem;">{{ s.city }} · {{ s.bedrooms }} BHK</p>
+                        <a href="{% url 'listing_detail' s.pk %}" class="btn btn-outline-primary btn-sm w-100">View</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if listing.latitude and listing.longitude %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([{{ listing.latitude }}, {{ listing.longitude }}], 15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap'}).addTo(map);
+L.marker([{{ listing.latitude }}, {{ listing.longitude }}])
+    .addTo(map)
+    .bindPopup('<b>{{ listing.title }}</b><br>₹{{ listing.price }}/mo')
+    .openPopup();
+</script>
+{% endif %}
+{% endblock %}
